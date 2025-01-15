@@ -1,20 +1,36 @@
 from flask import Flask
 from flask_restful import Api, Resource
+from flask_mongoengine import MongoEngine 
 
 app = Flask(__name__)
 api = Api(app)
+db = MongoEngine(app)
 
+
+app.config["MONGODB_SETTINGS"] = [
+    {
+        "db": "users",
+        "host": "mongodb",
+        "port": 27017,
+        "user": "root",
+        "password": "123456admin"
+    }
+]
+
+class User(db.Document):
+    email = StringField(required=True)
+    first_name = StringField(max_length=50)
+    last_name = StringField(max_length=50)
 
 class Users(Resource):
     def get(self):
-        return {"message": "user 1"}
+        return {"message": "user 1"}, 200
 
 
 class User(Resource):
-    def get(post):
-        return {"message": "test"}
-
-    def get(self, cpf):
+    def get(self, cpf=None):
+        if not cpf:
+            return {"error": "CPF is required"}, 400
         return {"message": "CPF"}
 
 
