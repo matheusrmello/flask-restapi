@@ -3,9 +3,6 @@ from flask_restful import Api, Resource
 from flask_mongoengine import MongoEngine 
 
 app = Flask(__name__)
-api = Api(app)
-db = MongoEngine(app)
-
 
 app.config["MONGODB_SETTINGS"] = [
     {
@@ -17,10 +14,18 @@ app.config["MONGODB_SETTINGS"] = [
     }
 ]
 
-class User(db.Document):
-    email = StringField(required=True)
-    first_name = StringField(max_length=50)
-    last_name = StringField(max_length=50)
+api = Api(app)
+db = MongoEngine(app)
+
+
+
+
+class UserModel(db.Document):
+    cpf = db.StringField(required=True, unique=True)
+    first_name = db.StringField(required=True)
+    last_name = db.StringField(required=True)
+    email = db.EmailField(required=True)
+    birth_date = db.DateTimeField(required=True)
 
 class Users(Resource):
     def get(self):
