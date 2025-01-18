@@ -1,5 +1,5 @@
 from flask import Flask
-from flask_restful import Api, Resource
+from flask_restful import Api, Resource, reqparse
 from flask_mongoengine import MongoEngine 
 
 app = Flask(__name__)
@@ -9,16 +9,40 @@ app.config["MONGODB_SETTINGS"] = [
         "db": "users",
         "host": "mongodb",
         "port": 27017,
-        "user": "root",
+        "username": "root",
         "password": "123456admin"
     }
 ]
 
+_user_parser=reqparse.RequestParser()
+_user_parser.add_argument('first_name',
+                          type=str,
+                          required=True,
+                          help='This field cannot be blank!'
+                          )
+_user_parser.add_argument('last_name',
+                          type=str,
+                          required=True,
+                          help='This field cannot be blank!'
+                          )
+_user_parser.add_argument('cpf',
+                          type=str,
+                          required=True,
+                          help='This field cannot be blank!'
+                          )
+_user_parser.add_argument('email',
+                          type=str,
+                          required=True,
+                          help='This field cannot be blank!'
+                          )
+_user_parser.add_argument('birth_date',
+                          type=str,
+                          required=True,
+                          help='This field cannot be blank!'
+                          )
+
 api = Api(app)
 db = MongoEngine(app)
-
-
-
 
 class UserModel(db.Document):
     cpf = db.StringField(required=True, unique=True)
@@ -28,14 +52,16 @@ class UserModel(db.Document):
     birth_date = db.DateTimeField(required=True)
 
 class Users(Resource):
+    
     def get(self):
-        return {"message": "user 1"}, 200
-
+        return {"message": "user 1"}
 
 class User(Resource):
-    def get(self, cpf=None):
-        if not cpf:
-            return {"error": "CPF is required"}, 400
+    def post(self):
+        data= _user_parser.parse_args()
+        UserModel(**data).save()
+    
+    def get(self):
         return {"message": "CPF"}
 
 
