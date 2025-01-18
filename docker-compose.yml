@@ -6,6 +6,8 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: 123456admin
+    depends_on:
+      - api
 
   api:
     build: .
@@ -15,5 +17,3 @@ services:
     restart: always
     volumes:
       - .:/app
-    depends_on:
-      - mongodb
