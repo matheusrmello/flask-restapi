@@ -6,8 +6,6 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: 123456admin
-    depends_on:
-      - api
 
   api:
     build: .
@@ -15,7 +13,9 @@ services:
     ports:
       - "5000:5000"
     restart: always
-    entrypoint:
+    environment:
       - FLASK_ENV=development
+    depends_on:
+      - mongodb
     volumes:
-      - .:/app
+      - ./application:/app/application
