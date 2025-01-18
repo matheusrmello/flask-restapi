@@ -1,4 +1,4 @@
-from flask import Flask, jsonify
+from flask import jsonify
 from flask_restful import Resource, reqparse
 from mongoengine import NotUniqueError
 from .model import UserModel
@@ -31,7 +31,6 @@ _user_parser.add_argument('birth_date',
                           required=True,
                           help='This field cannot be blank!'
                           )
-
 
 
 class Users(Resource):
