@@ -8,5 +8,8 @@ compose:
 	@docker compose build
 	@docker compose up
 
-pytest:
-	
+heroku:
+	@heroku container:login
+	@heroku container:push -a <project> web
+	@heroku container:release -a <project> web
+	@heroku ps:scale -a <project> web=1
