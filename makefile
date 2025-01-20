@@ -1,7 +1,7 @@
-APP = restapi
+APP = math-api-flask
 
 test:
-	@flake8 . --exclude .venv
+	@flake8 . --ignore=E501 --exclude .venv
 	@pytest -v --disable-warnings
 
 compose:
@@ -10,6 +10,6 @@ compose:
 
 heroku:
 	@heroku container:login
-	@heroku container:push -a <project> web
-	@heroku container:release -a <project> web
-	@heroku ps:scale -a <project> web=1
+	@heroku container:push -a $(APP) web
+	@heroku container:release -a $(APP) web
+	@heroku ps:scale -a $(APP) web=1
