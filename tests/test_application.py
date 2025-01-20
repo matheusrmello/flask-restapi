@@ -15,8 +15,7 @@ class TestApplication():
             "last_name": "Roberto",
             "cpf": "602.927.330-20",
             "email": "contato@matheus.com",
-            "birth_date": "1998-06-10"
-            }
+            "birth_date": "1998-06-10"}
 
     @pytest.fixture
     def invalid_user(self):
@@ -25,8 +24,7 @@ class TestApplication():
             "last_name": "Roberto",
             "cpf": "123.456.789-11",
             "email": "contato@matheus.com",
-            "birth_date": "1998-06-10"
-            }
+            "birth_date": "1998-06-10"}
 
     def test_get_users(self, client):
         response = client.get("/users")

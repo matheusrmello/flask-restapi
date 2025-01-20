@@ -21,7 +21,8 @@ class ProdConfig():
 
     MONGODB_SETTINGS = [
         {
-            "host": "mongodb+srv://%s:%s@%s/%s?retryWrites=true&w=majority&appName=flask-db" % (
+            "host": "mongodb+srv://%s:%s@%s/%s?retryWrites=true&w=majority&appName=flask-db"
+            % (
                 MONGODB_USER,
                 MONGODB_PASSWORD,
                 MONGODB_HOST,
