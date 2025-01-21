@@ -10,11 +10,14 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.9'
+          
       - name: Install dependencies
         run: |
           pip install -r requirements.txt
-          pip install flake8 pytest
+          pip install flake8 pytest mongomock
           
       - name: Run test
         run: make test
