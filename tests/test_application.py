@@ -50,5 +50,13 @@ class TestApplication():
         assert birth_date == "1998-06-10T00:00:00Z"
 
         response = client.get('/user/%s' % invalid_user["cpf"])
-        assert response.status_code == 400
+        assert response.status_code == 404
         assert b"User does not exist in database!" in response.data
+
+    def test_delete_user(self, client, valid_user, invalid_user):
+        response = client.delete('/user/%s' % valid_user['cpf'])
+        assert response.status_code == 200
+
+        response = client.delete('/user/%s' % invalid_user['cpf'])
+        assert response.status_code == 404
+        assert b"deleted" in response.data
