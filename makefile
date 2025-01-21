@@ -1,4 +1,4 @@
-APP = math-api-flask
+APP = restapp-flask
 
 test:
 	@flake8 . --ignore=E501 --exclude .venv
