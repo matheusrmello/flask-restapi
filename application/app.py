@@ -2,8 +2,10 @@ from flask import jsonify
 from flask_restful import Resource, reqparse
 from mongoengine import NotUniqueError
 from .model import UserModel
+from loguru import logger
 import re
 
+logger.add("logs/app.log", retention="1 day", format="{time:DD-MM-YYYY at HH:mm:ss} | {level} | {message}")
 
 _user_parser = reqparse.RequestParser()
 _user_parser.add_argument('first_name',
@@ -36,6 +38,7 @@ _user_parser.add_argument('birth_date',
 class Users(Resource):
 
     def get(self):
+        logger.info("Getting all users")
         return jsonify(UserModel.objects())
 
 
@@ -65,16 +68,35 @@ class User(Resource):
     def post(self):
         data = _user_parser.parse_args()
         if not self.validate_cpf(data["cpf"]):
-            return {"message": "CPF is invalid!"}, 400
+            result = {"message": "CPF is invalid!"}
+            logger.warning("CPF validation failed: {data['cpf']}")
+            return result, 400
         try:
             response = UserModel(**data).save()
-            return {"message": "User %s successfully created!"
-                    % response.id}, 201
+            result = {"message": "User %s successfully created!" % response.id}
+            logger.info("User %s successfully created!" % response.id)
+            return result, 201
         except NotUniqueError:
-            return {"message": "CPF already exist in database!"}, 400
+            result = {"confict": "CPF already exist in database!"}
+            logger.warning("CPF already exist in database")
+            return result, 409
 
     def get(self, cpf):
         response = UserModel.objects(cpf=cpf)
         if response:
             return jsonify(response)
-        return {"message": "User does not exist in database!"}, 400
+        result = {"message": "User does not exist in database!"}
+        logger.error("message: User does not exist in database")
+        return result, 404
+
+    def delete(self, cpf):
+        response = UserModel.objects(cpf=cpf)
+        if response:
+            response.delete()
+            result = {"message": "User successfully deleted!"}
+            logger.info("User successfully deleted")
+            return result, 200
+        else:
+            result = {"message": "User already deleted in database!"}
+            logger.warning("User not found in database")
+            return result, 404
