@@ -53,6 +53,17 @@ class TestApplication():
         assert response.status_code == 404
         assert b"User does not exist in database!" in response.data
 
+    def test_patch_user(self, client, valid_user):
+        valid_user["email"] = "contato2@matheus.com"
+        response = client.patch('/user', json=valid_user)
+        assert response.status_code == 200
+        assert b"updated" in response.data
+
+        valid_user["cpf"] = "557.477.840-80"
+        response = client.patch('/user', json=valid_user)
+        assert response.status_code == 404
+        assert b"does not exist in database" in response.data
+
     def test_delete_user(self, client, valid_user, invalid_user):
         response = client.delete('/user/%s' % valid_user['cpf'])
         assert response.status_code == 200

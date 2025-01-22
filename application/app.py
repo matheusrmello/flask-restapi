@@ -100,3 +100,21 @@ class User(Resource):
             result = {"message": "User already deleted in database!"}
             logger.warning("User not found in database")
             return result, 404
+
+    def patch(self):
+        data = _user_parser.parse_args()
+        if not self.validate_cpf(data["cpf"]):
+            result = {"message": "CPF is invalid!"}
+            logger.warning("CPF validation failed: {data['cpf']}")
+            return result, 400
+
+        response = UserModel.objects(cpf=data["cpf"])
+        if response:
+            response.update(**data)
+            result = {"message": "User successfully updated!"}
+            logger.info("User successfully updated")
+            return result, 200
+        else:
+            result = {"message": "User does not exist in database!"}
+            logger.warning("User not found in database")
+            return result, 404
