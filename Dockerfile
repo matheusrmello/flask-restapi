@@ -6,9 +6,7 @@ COPY requirements.txt .
 
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY wsgi.py .
-COPY config.py .
-COPY application application
+COPY wsgi.py config.py application/ ./
 
 EXPOSE 5000
 
