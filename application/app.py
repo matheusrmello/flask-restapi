@@ -5,34 +5,28 @@ from .model import UserModel, HealthCheckModel
 from loguru import logger
 import re
 
-logger.add("logs/app.log", retention="1 day", format="{time:DD-MM-YYYY at HH:mm:ss} | {level} | {message}")
+logger.add(
+    "logs/app.log",
+    retention="1 day",
+    format="{time:DD-MM-YYYY at HH:mm:ss} | {level} | {message}",
+)
 
 _user_parser = reqparse.RequestParser()
-_user_parser.add_argument('first_name',
-                          type=str,
-                          required=True,
-                          help='This field cannot be blank!'
-                          )
-_user_parser.add_argument('last_name',
-                          type=str,
-                          required=True,
-                          help='This field cannot be blank!'
-                          )
-_user_parser.add_argument('cpf',
-                          type=str,
-                          required=True,
-                          help='This field cannot be blank!'
-                          )
-_user_parser.add_argument('email',
-                          type=str,
-                          required=True,
-                          help='This field cannot be blank!'
-                          )
-_user_parser.add_argument('birth_date',
-                          type=str,
-                          required=True,
-                          help='This field cannot be blank!'
-                          )
+_user_parser.add_argument(
+    "first_name", type=str, required=True, help="This field cannot be blank!"
+)
+_user_parser.add_argument(
+    "last_name", type=str, required=True, help="This field cannot be blank!"
+)
+_user_parser.add_argument(
+    "cpf", type=str, required=True, help="This field cannot be blank!"
+)
+_user_parser.add_argument(
+    "email", type=str, required=True, help="This field cannot be blank!"
+)
+_user_parser.add_argument(
+    "birth_date", type=str, required=True, help="This field cannot be blank!"
+)
 
 
 class HealthCheck(Resource):
@@ -46,16 +40,14 @@ class HealthCheck(Resource):
 
 
 class Users(Resource):
-
     def get(self):
         logger.info("Getting all users")
         return jsonify(UserModel.objects())
 
 
 class User(Resource):
-
     def validate_cpf(self, cpf):
-        if not re.match(r'\d{3}\.\d{3}\.\d{3}-\d{2}', cpf):
+        if not re.match(r"\d{3}\.\d{3}\.\d{3}-\d{2}", cpf):
             return False
 
         numbers = [int(digit) for digit in cpf if digit.isdigit()]
