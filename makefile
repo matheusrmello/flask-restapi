@@ -1,6 +1,9 @@
 APP = restapp-flask
 
 test:
+	@echo "Running tests..."
+	@black .
+	@bandit -r . -x /tests/,/.venv/
 	@flake8 . --ignore=E501 --exclude .venv
 	@pytest -v --disable-warnings
 

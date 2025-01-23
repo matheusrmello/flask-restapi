@@ -1,51 +1,53 @@
 from flask import jsonify
 from flask_restful import Resource, reqparse
 from mongoengine import NotUniqueError
-from .model import UserModel
+from .model import UserModel, HealthCheckModel
 from loguru import logger
 import re
 
-logger.add("logs/app.log", retention="1 day", format="{time:DD-MM-YYYY at HH:mm:ss} | {level} | {message}")
+logger.add(
+    "logs/app.log",
+    retention="1 day",
+    format="{time:DD-MM-YYYY at HH:mm:ss} | {level} | {message}",
+)
 
 _user_parser = reqparse.RequestParser()
-_user_parser.add_argument('first_name',
-                          type=str,
-                          required=True,
-                          help='This field cannot be blank!'
-                          )
-_user_parser.add_argument('last_name',
-                          type=str,
-                          required=True,
-                          help='This field cannot be blank!'
-                          )
-_user_parser.add_argument('cpf',
-                          type=str,
-                          required=True,
-                          help='This field cannot be blank!'
-                          )
-_user_parser.add_argument('email',
-                          type=str,
-                          required=True,
-                          help='This field cannot be blank!'
-                          )
-_user_parser.add_argument('birth_date',
-                          type=str,
-                          required=True,
-                          help='This field cannot be blank!'
-                          )
+_user_parser.add_argument(
+    "first_name", type=str, required=True, help="This field cannot be blank!"
+)
+_user_parser.add_argument(
+    "last_name", type=str, required=True, help="This field cannot be blank!"
+)
+_user_parser.add_argument(
+    "cpf", type=str, required=True, help="This field cannot be blank!"
+)
+_user_parser.add_argument(
+    "email", type=str, required=True, help="This field cannot be blank!"
+)
+_user_parser.add_argument(
+    "birth_date", type=str, required=True, help="This field cannot be blank!"
+)
+
+
+class HealthCheck(Resource):
+    def get(self):
+        response = HealthCheckModel.objects(status="Healthy")
+        if response:
+            return "Healthy", 200
+        else:
+            HealthCheckModel(status="Healthy").save()
+            return "Healthy", 200
 
 
 class Users(Resource):
-
     def get(self):
         logger.info("Getting all users")
         return jsonify(UserModel.objects())
 
 
 class User(Resource):
-
     def validate_cpf(self, cpf):
-        if not re.match(r'\d{3}\.\d{3}\.\d{3}-\d{2}', cpf):
+        if not re.match(r"\d{3}\.\d{3}\.\d{3}-\d{2}", cpf):
             return False
 
         numbers = [int(digit) for digit in cpf if digit.isdigit()]
@@ -98,5 +100,23 @@ class User(Resource):
             return result, 200
         else:
             result = {"message": "User already deleted in database!"}
+            logger.warning("User not found in database")
+            return result, 404
+
+    def patch(self):
+        data = _user_parser.parse_args()
+        if not self.validate_cpf(data["cpf"]):
+            result = {"message": "CPF is invalid!"}
+            logger.warning("CPF validation failed: {data['cpf']}")
+            return result, 400
+
+        response = UserModel.objects(cpf=data["cpf"])
+        if response:
+            response.update(**data)
+            result = {"message": "User successfully updated!"}
+            logger.info("User successfully updated")
+            return result, 200
+        else:
+            result = {"message": "User does not exist in database!"}
             logger.warning("User not found in database")
             return result, 404
