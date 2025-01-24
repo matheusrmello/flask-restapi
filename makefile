@@ -24,10 +24,10 @@ setup-dev:
 		--install \
 		--set image.tag=5.0.8 \
 		--set auth.rootPassword="root" \
-		mongodb kubernetes/charts/mongodb
+		mongodb k8s/charts/mongodb
 	@kubectl wait \
   	--for=condition=ready pod \
-  	--selector=app.kubernetes.io/name=mongodb \
+  	--selector=app.kubernetes.io/component=mongodb \
   	--timeout=270s
 
 teardown-dev:
