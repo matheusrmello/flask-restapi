@@ -1,0 +1,4 @@
+- hosts: mongodb
+  become: yes
+  roles:
+    - community.mongodb.mongodb_linux
